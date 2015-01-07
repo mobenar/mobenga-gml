@@ -1,4 +1,3 @@
-gml
-===
+# GML
 
-GML (Graph Modelling Language) format
+GML (Graph Modelling Language) parser and stringifier.

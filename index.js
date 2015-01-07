@@ -64,6 +64,10 @@ exports.parse = function (string) {
 
 exports.stringify = function (object, options) {
 
+	if (typeof object.toJSON === 'function') {
+		object = object.toJSON();
+	}
+
 	var nodes = object.nodes || [];
 	var edges = object.edges || [];
 	var indent1 = (typeof options.indent === 'string' ? options.indent : '  ');

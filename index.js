@@ -68,6 +68,8 @@ exports.stringify = function (object, options) {
 		object = object.toJSON();
 	}
 
+	options = options || {};
+
 	var nodes = object.nodes || [];
 	var edges = object.edges || [];
 	var indent1 = (typeof options.indent === 'string' ? options.indent : '  ');
@@ -104,10 +106,11 @@ exports.stringify = function (object, options) {
 		});
 	}
 
-	addAttributes({
-		directed: object.directed ? 1 : 0,
-		label: object.label
-	}, indent1);
+	addAttributes({ directed: object.directed ? 1 : 0 }, indent1);
+
+	if (object.label) {
+		addAttributes({ label: object.label }, indent1);
+	}
 
 	if (getGraphAttributes) {
 		addAttributes(getGraphAttributes(object), indent1);

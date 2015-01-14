@@ -37,31 +37,25 @@
  ]
  */
 
-var toString = Object.prototype.toString;
-
-/*
- function errorMessage(lineNumber, line) {
-
- var message = 'GML parse error';
-
- if (lineNumber) {
- message += ', line ' + lineNumber;
- }
-
- if (line) {
- message += ': ' + line;
- }
-
- return message;
- }
+/**
+ * Parses GML string.
+ *
+ * @param {String} string
+ * @returns {Object}
  */
-
 exports.parse = function (string) {
 
 	// TODO: Parse GML
 	throw Error('GML parse not implemented yet');
 };
 
+/**
+ * Stringifies GML object.
+ *
+ * @param {Object} object
+ * @param {Object} [options]
+ * @returns {String}
+ */
 exports.stringify = function (object, options) {
 
 	if (typeof object.toJSON === 'function') {
@@ -95,7 +89,7 @@ exports.stringify = function (object, options) {
 
 			var value = attributes[key];
 
-			if (value && toString.call(value) === '[object Object]') {
+			if (isObject(value)) {
 				lines.push(indent + key + ' [');
 				addAttributes(value, indent + indent1);
 				lines.push(indent + ']');
@@ -153,3 +147,25 @@ exports.stringify = function (object, options) {
 
 	return lines.join('\n');
 };
+
+function isObject(value) {
+
+	return (value && Object.prototype.toString.call(value) === '[object Object]');
+}
+
+/*
+function errorMessage(lineNumber, line) {
+
+	var message = 'GML parse error';
+
+	if (lineNumber) {
+		message += ', line ' + lineNumber;
+	}
+
+	if (line) {
+		message += ': ' + line;
+	}
+
+	return message;
+}
+*/

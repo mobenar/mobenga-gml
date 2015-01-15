@@ -43,7 +43,7 @@
  * @param {String} string
  * @returns {Object}
  */
-exports.parse = function (string) {
+exports.parse = function parse(string) {
 
 	// TODO: Parse GML
 	throw Error('GML parse not implemented yet');
@@ -52,75 +52,70 @@ exports.parse = function (string) {
 /**
  * Stringifies GML object.
  *
- * @param {Object} object
+ * @param {Object} graph
  * @param {Object} [options]
  * @returns {String}
  */
-exports.stringify = function (object, options) {
+exports.stringify = function stringify(graph, options) {
 
-	if (typeof object.toJSON === 'function') {
-		object = object.toJSON();
+	if (typeof graph.toJSON === 'function') {
+		graph = graph.toJSON();
 	}
 
 	options = options || {};
 
-	var nodes = object.nodes || [];
-	var edges = object.edges || [];
+	var nodes = graph.nodes || [];
+	var edges = graph.edges || [];
 	var indent1 = (typeof options.indent === 'string' ? options.indent : '  ');
 	var indent2 = indent1 + indent1;
 	var getGraphAttributes = options.graphAttributes || null;
 	var getNodeAttributes = options.nodeAttributes || null;
 	var getEdgeAttributes = options.edgeAttributes || null;
-
 	var lines = ['graph ['];
 
-	function attribute(key, value) {
+	function addAttribute(key, value, indent) {
 
-		return (key + ' ' + JSON.stringify(value));
-	}
+		if (isObject(value)) {
+			lines.push(indent + key + ' [');
 
-	function addAttributes(attributes, indent) {
+			forIn(value, function (key, value) {
 
-		if (!attributes) {
-			return;
+				addAttribute(key, value, indent + indent1);
+			});
+
+			lines.push(indent + ']');
 		}
-
-		Object.keys(attributes).forEach(function (key) {
-
-			var value = attributes[key];
-
-			if (isObject(value)) {
-				lines.push(indent + key + ' [');
-				addAttributes(value, indent + indent1);
-				lines.push(indent + ']');
-			}
-			else {
-				lines.push(indent + attribute(key, value));
-			}
-		});
+		else {
+			lines.push(indent + attribute(key, value));
+		}
 	}
 
-	addAttributes({ directed: object.directed ? 1 : 0 }, indent1);
+	forIn(graph, function (key, value) {
 
-	if (object.label) {
-		addAttributes({ label: object.label }, indent1);
-	}
+		if (key !== 'nodes' && key !== 'edges') {
+			addAttribute(key, value, indent1);
+		}
+	});
 
 	if (getGraphAttributes) {
-		addAttributes(getGraphAttributes(object), indent1);
+		forIn(getGraphAttributes(graph), function (key, value) {
+
+			addAttribute(key, value, indent1);
+		});
 	}
 
 	nodes.forEach(function (node) {
 
 		lines.push(indent1 + 'node [');
 
-		addAttributes({
-			id: node.id,
-			label: node.label
-		}, indent2);
+		addAttribute('id', node.id, indent2);
+		addAttribute('label', node.label, indent2);
 
 		if (getNodeAttributes) {
-			addAttributes(getNodeAttributes(node), indent2);
+			forIn(getNodeAttributes(node), function (key, value) {
+
+				addAttribute(key, value, indent2);
+			});
 		}
 
 		lines.push(indent1 + ']');
@@ -130,14 +125,15 @@ exports.stringify = function (object, options) {
 
 		lines.push(indent1 + 'edge [');
 
-		addAttributes({
-			source: edge.source,
-			target: edge.target,
-			label: edge.label
-		}, indent2);
+		addAttribute('source', edge.source, indent2);
+		addAttribute('target', edge.target, indent2);
+		addAttribute('label', edge.label, indent2);
 
 		if (getEdgeAttributes) {
-			addAttributes(getEdgeAttributes(edge), indent2);
+			forIn(getEdgeAttributes(edge), function (key, value) {
+
+				addAttribute(key, value, indent2);
+			});
 		}
 
 		lines.push(indent1 + ']');
@@ -151,6 +147,23 @@ exports.stringify = function (object, options) {
 function isObject(value) {
 
 	return (value && Object.prototype.toString.call(value) === '[object Object]');
+}
+
+function forIn(object, callback) {
+
+	Object.keys(object).forEach(function (key) {
+
+		callback(key, object[key]);
+	});
+}
+
+function attribute(key, value) {
+
+	if (typeof value === 'boolean') {
+		value = value ? 1 : 0;
+	}
+
+	return (key + ' ' + JSON.stringify(value));
 }
 
 /*

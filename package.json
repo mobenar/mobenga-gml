@@ -4,7 +4,7 @@
   "description": "GML (Graph Modelling Language) parser and stringifier",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/mocha -r mocha-clean"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
   "homepage": "https://github.com/mobenar/mobenga-gml",
   "devDependencies": {
     "chai": "^1.10.0",
-    "mocha": "^2.1.0"
+    "mocha": "^2.1.0",
+    "mocha-clean": "^0.4.0"
   }
 }

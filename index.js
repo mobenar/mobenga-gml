@@ -1,13 +1,76 @@
 /**
  * Parses GML string.
  *
- * @param {String} string
+ * @param {String} gml
  * @returns {Object}
+ * @throws {Error}
  */
-exports.parse = function parse(string) {
+exports.parse = function parse(gml) {
 
-	// TODO: Parse GML
-	throw Error('GML parse not implemented yet');
+	var json = ('{\n' + gml + '\n}')
+		.replace(/^(\s*)(\w+)\s*\[/gm, '$1"$2": {')
+		.replace(/^(\s*)\]/gm, '$1},')
+		.replace(/^(\s*)(\w+)\s+(.+)$/gm, '$1"$2": $3,')
+		.replace(/,(\s*)\}/g, '$1}');
+
+	var graph = {};
+	var nodes = [];
+	var edges = [];
+	var i = 0;
+	var parsed;
+
+	json = json.replace(/^(\s*)"node"/gm, function (all, indent) {
+
+		return (indent + '"node[' + (i++) + ']"');
+	});
+
+	i = 0;
+
+	json = json.replace(/^(\s*)"edge"/gm, function (all, indent) {
+
+		return (indent + '"edge[' + (i++) + ']"');
+	});
+
+	try {
+		parsed = JSON.parse(json);
+	}
+	catch (err) {
+		throw Error('bad format');
+	}
+
+	if (!isObject(parsed.graph)) {
+		throw Error('no graph tag');
+	}
+
+	forIn(parsed.graph, function (key, value) {
+
+		var matches = key.match(/^(\w+)\[(\d+)\]$/);
+		var name;
+		var i;
+
+		if (matches) {
+			name = matches[1];
+			i = parseInt(matches[2], 10);
+
+			if (name === 'node') {
+				nodes[i] = value;
+			}
+			else if (name === 'edge') {
+				edges[i] = value;
+			}
+			else {
+				graph[key] = value;
+			}
+		}
+		else {
+			graph[key] = value;
+		}
+	});
+
+	graph.nodes = nodes;
+	graph.edges = edges;
+
+	return graph;
 };
 
 /**
@@ -120,26 +183,5 @@ function forIn(object, callback) {
 
 function attribute(key, value) {
 
-	if (typeof value === 'boolean') {
-		value = value ? 1 : 0;
-	}
-
 	return (key + ' ' + JSON.stringify(value));
 }
-
-/*
-function errorMessage(lineNumber, line) {
-
-	var message = 'GML parse error';
-
-	if (lineNumber) {
-		message += ', line ' + lineNumber;
-	}
-
-	if (line) {
-		message += ': ' + line;
-	}
-
-	return message;
-}
-*/

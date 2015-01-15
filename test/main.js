@@ -6,7 +6,7 @@ var expect = require('chai').expect;
 var GML = require('../index');
 
 var graph = {
-	directed: true,
+	directed: 1,
 	nodes: [
 		{ id: 1, label: 'A' },
 		{ id: 2, label: 'B' },
@@ -37,14 +37,14 @@ describe('GML', function () {
 		gml = fs.readFileSync('test/graph.gml', 'utf8').replace(/\r\n/g, '\n');
 	});
 
-	it.skip('should parse', function () {
+	it('should parse', function parse() {
 
 		var parsed = GML.parse(gml);
 
 		expect(parsed).to.deep.equal(graph);
 	});
 
-	it('should stringify', function () {
+	it('should stringify', function stringify() {
 
 		var string = GML.stringify(graph, { indent: indent });
 

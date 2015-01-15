@@ -1,6 +1,6 @@
 {
   "name": "mobenga-gml",
-  "version": "0.9.0",
+  "version": "0.9.3",
   "description": "GML (Graph Modelling Language) parser and stringifier",
   "main": "index.js",
   "scripts": {

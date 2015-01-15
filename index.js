@@ -3,7 +3,7 @@
  *
  * @param {String} gml
  * @returns {Object}
- * @throws {Error}
+ * @throws {SyntaxError}
  */
 exports.parse = function parse(gml) {
 
@@ -35,11 +35,11 @@ exports.parse = function parse(gml) {
 		parsed = JSON.parse(json);
 	}
 	catch (err) {
-		throw Error('bad format');
+		throw new SyntaxError('bad format');
 	}
 
 	if (!isObject(parsed.graph)) {
-		throw Error('no graph tag');
+		throw new SyntaxError('no graph tag');
 	}
 
 	forIn(parsed.graph, function (key, value) {

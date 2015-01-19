@@ -136,7 +136,7 @@ exports.stringify = function stringify(graph, options) {
 		addAttribute('label', node.label, indent2);
 
 		if (getNodeAttributes) {
-			forIn(getNodeAttributes(node), function (key, value) {
+			forIn(getNodeAttributes(node) || {}, function (key, value) {
 
 				addAttribute(key, value, indent2);
 			});
@@ -154,7 +154,7 @@ exports.stringify = function stringify(graph, options) {
 		addAttribute('label', edge.label, indent2);
 
 		if (getEdgeAttributes) {
-			forIn(getEdgeAttributes(edge), function (key, value) {
+			forIn(getEdgeAttributes(edge) || {}, function (key, value) {
 
 				addAttribute(key, value, indent2);
 			});

@@ -183,5 +183,12 @@ function forIn(object, callback) {
 
 function attribute(key, value) {
 
-	return (key + ' ' + JSON.stringify(value));
+	if (typeof value === 'boolean') {
+		value = Number(value);
+	}
+	else {
+		value = JSON.stringify(value);
+	}
+
+	return (key + ' ' + value);
 }
